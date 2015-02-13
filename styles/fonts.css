@@ -1,0 +1,69 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('../fonts/icomoon.eot?-4wpu95');
+	src:url('../fonts/icomoon.eot?#iefix-4wpu95') format('embedded-opentype'),
+		url('../fonts/icomoon.woff?-4wpu95') format('woff'),
+		url('../fonts/icomoon.ttf?-4wpu95') format('truetype'),
+		url('../fonts/icomoon.svg?-4wpu95#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-chevron-left:before {
+	content: "\e600";
+}
+
+.icon-chevron-right:before {
+	content: "\e601";
+}
+
+.icon-dot-single:before {
+	content: "\e602";
+}
+
+.icon-dots-three-horizontal:before {
+	content: "\e603";
+}
+
+.icon-ccw:before {
+	content: "\e604";
+}
+
+.icon-cross:before {
+	content: "\e605";
+}
+
+.icon-cw:before {
+	content: "\e606";
+}
+
+.icon-cycle:before {
+	content: "\e607";
+}
+
+.icon-edit:before {
+	content: "\e608";
+}
+
+.icon-help-with-circle:before {
+	content: "\e609";
+}
+
+.icon-info-with-circle:before {
+	content: "\e60a";
+}
+
