@@ -24,15 +24,23 @@ body{
 	background-color: #fff;
 }
 .ct-chart-pie .ct-label {
-	font-size: 1.6rem;
+	font-size: 1rem;
 	fill: rgba(255,255,255,1);
 }
-.checkedin-status{
-	font-size: 4rem;
-	color: #ccc
+.checkedin-status i{
+	font-size: 10rem;
+	line-height: 0;
+	display: block;
+	padding: 20px 0
 }
-.checkedin-status.in, .notification-status.in{
+.checkedin-status i, .notification-status, .status-key i{
+	color: #f39c12;
+}
+.checkedin-status.in i, .notification-status.in, .status-key .in{
 	color: #27ae60
+}
+.checkedin-status.out i, .notification-status.out, .status-key .out{
+	color: #ccc
 }
 table th, table td{
 	padding: 5px
@@ -74,7 +82,19 @@ table th, table td{
 .notificaiton-detail{
 	margin-bottom: 0
 }
-
+.status-key .inline li{
+	font-size: 1rem;
+	position: relative;
+	margin-right: 35px
+}
+.status-key i{
+	font-size: 4rem
+}
+.status-key i:before{
+	position: absolute;
+	left: -31px;
+	top: 14px;
+}
 </style>
 
 <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyCJL4ZhaSPo0dib7Nlk1XoJEn1sNwWflJI'></script>
@@ -96,53 +116,62 @@ table th, table td{
 
 
 	<div class="row">
+
 		<div class="span-1 pad staff-checkins">
 			<table style="width:100%" class="normal">
 				<thead>
 					<tr>
-						<th width="5%">Status</th>
-						<th width="5%">Staff Name</th>
-						<th width="40%">Address </th>
-						<th width="12%">Time In</th>
-						<th width="12%">Time Out</th>
-						<th width="8%">Hours</th>
-						<th width="10%">Date</th>
+						<th class="c" width="1%">Status</th>
+						<th width="20%">Staff Name</th>
+						<th width="30%">Aprox. Location </th>
+						<th class="c" width="15%">Time In</th>
+						<th class="c" width="15%">Time Out</th>
+						<th class="c" width="5%">Hours</th>
+						<th class="c" width="15%">Date</th>
 					</tr>
 				</thead>
 				<tbody>
 
-					<tr ng-repeat="(id, item) in interactionData.posts" ng-class-even="'zebra'">
-						<td><span class="checkedin-status in"><i class="icon-dot-single"></i></span></td>
-						<td>{{item.staffid}}</td>
-						<td>{{item.checkedInAddress}}</td>
-						<td>{{item.timeIn}}</td>
-						<td>{{item.timeOut}}</td>
-						<td ng-bind="setWorkedHours()"></td>
-						<td>{{item.demoDate}}</td>
+					<tr ng-repeat="(id, item) in interactionData" ng-class-even="'zebra'">
+						<td><span class="checkedin-status" ng-class="item.end ? 'out' : item.start ? 'in' : '' "><i class="icon-dot-single"></i></span></td>
+						<td>{{item.name}}</td>
+						<td>{{item.location}}</td>
+						<td class="c">{{item.start}}</td>
+						<td class="c">{{item.end}}</td>
+						<td class="c">{{item.hours && item.hours || "0.00"}}</td>
+						<td class="c">{{item.date}}</td>
 					</tr>
 					
 				</tbody>
 			</table>
 		</div>
+
+		<div class="span-1 status-key grey-line bottom-line">
+			<ul class="unstyled inline pad align-right">
+				<li><i class="icon-dot-single"></i> Not Checked In</li>
+				<li><i class="icon-dot-single in"></i> Checked In</li>
+				<li><i class="icon-dot-single out"></i> Checked out</li>
+			</ul>
+		</div>
+
+
 	</div>
 
 
-<!--
+
 	<div class="row">
-		<div class="span-1 c pad">
-			<h3 class="lighter">Total Number of Interactions by Staff Member</h3>
+		<div class="span-2 c pad">
+			<h3 class="lighter">No. of Interactions by Staff Members</h3>
 			<chartist class="ct-chart ct-golden-section" chartist-data="barData" chartist-chart-type="Line" chartist-chart-options="barOptions"></chartist>
 		</div>
-	</div>
 
-	<div class="row">
-		<div class="span-1 c no-pad">
+		<div class="span-2 c pad">
 			<h3 class="lighter">Manager Satisfication</h3>
 			<chartist class="ct-chart ct-golden-section" chartist-data="pieData" chartist-chart-type="Pie"></chartist>
 		</div>
-		
 	</div>
--->
+
+
 
 </div><!-- end inner -->
 
@@ -158,7 +187,7 @@ table th, table td{
 <script src="scripts/lib/chartist.js"></script>
 <script src="scripts/lib/ng-chartist.js"></script>
 
-<script src="scripts/source/dashboard/pollyfill.js"></script>
+<!-- <script src="scripts/source/dashboard/pollyfill.js"></script>-->
 <script src="scripts/source/dashboard/dash.constants.js"></script>
 <script src="scripts/source/dashboard/dash.services.js"></script>
 <script src="scripts/source/dashboard/dash.controller.js"></script>

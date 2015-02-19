@@ -18,6 +18,58 @@
 
 
 
+	/* Firebase handler
+	----------------------------------------------------*/
+	fusionApp.service('firebaseService', ["$firebase", function ($firebase){
+		var ref = new Firebase(config.firebase),
+			sync = $firebase(ref),
+			self = this;
+
+
+		// fetches firebase data
+		self.getSync = function(){
+			return sync.$asObject();
+		};
+
+
+		// requests firebase data & returns a promise
+		self.getData = function(){
+			var data = self.getSync();
+
+			return data.$loaded(function(){
+				return data;
+			});
+		};
+
+
+		/*
+			Determines which key in data is for the logged in user based off of email
+			args = {email:"", data:""}
+		-----------------------------------------------------------*/
+		self.getUserData = function(args){
+			var userData = {};
+
+			for(var person in args.data){
+				if( args.data[person].email === args.email ){
+					userData = args.data[person];
+					userData.fireBaseKey = person;
+
+					return userData;
+				}
+			}
+		};
+
+
+		// updates the firebsase record for this user
+		self.update = function(data){
+			return sync.$update(data.fireBaseKey, data);
+		};
+
+	}]);
+
+
+
+
 	/* LocalStorage Service for backups and autosave
 	----------------------------------------------------*/
 	fusionApp.service('locStorage', ["$window", function ($window){
@@ -60,12 +112,22 @@
 
 	/* Utility services to help yall out
 	----------------------------------------------------*/
-	fusionApp.service('utility', ["loader", function (loader){
+	fusionApp.service('utility', ["$timeout", "$window", "loader", function ($timeout, $window, loader){
+
+		this.checkedIn = function(element){
+			$(element).replaceWith(app.config.templates.checked_in);
+			$timeout(function(){
+				$window.location.hash = "#report";
+			}, 2000);
+		};
+
+
+		this.hasCheckedOut = function(){
+			$("#SendReport").replaceWith('<div class="green ui-btn btn">Sweet! You&#39;re good!</div>');
+		};
 
 		//if user allows, gets the position of the user
 		this.getGeoPosition = function(){
-
-			//if supported
 			if ("geolocation" in navigator) {
 				var coords = navigator.geolocation.getCurrentPosition(function (position){
 					return position.coords.latitude;
@@ -73,6 +135,20 @@
 
 				return coords;
 			}
+		};
+
+
+		// Sets the total hours worked for each checked in person
+		this.setWorkedHours = function(args){
+			var totalHours, timeIn, timeOut;
+
+			timeIn = new Date(args.date +" "+ args.start);
+			timeOut = new Date(args.date +" "+ args.end);
+
+			totalHours = (timeOut - timeIn)/1000; /* get total seconds */
+			totalHours = (totalHours/60)/60; /* get total minutes then hours */
+
+			return totalHours < 0 ? 0 : totalHours.toFixed(2);
 		};
 
 

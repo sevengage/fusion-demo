@@ -33,9 +33,14 @@ fusionDashboard.controller('DashboardController', ["$scope", "fusion", "Interact
     $scope.interactionData.$watch(init);
 
 
-    function init(){
-        $scope.$broadcast("dataLoaded", true);
+    function init(event){
+        //console.log( $scope.interactionData);
+        //console.log(event)
 
+        if(event.event === "child_changed"){
+            $scope.$broadcast("dataLoaded", {key: event.key});
+        }
+        
         initMap();
         //initCharts();
     }
@@ -44,31 +49,19 @@ fusionDashboard.controller('DashboardController', ["$scope", "fusion", "Interact
 
     // Initilize the Map after data has been loaded
     function initMap(){
-        $scope.map.markers = InteractionService.getCoords($scope.interactionData.posts);
+        $scope.map.markers = InteractionService.getCoords($scope.interactionData);
         return $scope.map.markers;
     }
    
-
-    // Sets the total hours worked for each checked in person
-    $scope.setWorkedHours = function(){
-        var totalHours,
-            timeIn = new Date(this.item.demoDate +" "+ this.item.timeIn);
-            timeOut = new Date(this.item.demoDate +" "+ this.item.timeOut);
-
-        totalHours = (timeOut - timeIn)/1000; /* get total seconds */
-        totalHours = (totalHours/60)/60; /* get total minutes then hours */
-
-        return totalHours < 0 ? 0 : totalHours.toFixed(2);
-    };
 
 
 
 
 	// bar chart
     $scope.barData = {
-        labels: [],
+        labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
         series: [
-            //[5, 4, 3]
+            [120, 190, 170, 250, 230,]
         ]
     };
 
@@ -89,6 +82,10 @@ fusionDashboard.controller('DashboardController', ["$scope", "fusion", "Interact
         series: [20, 10, 30, 40]
     };
 
+    $scope.demos = {
+        labels: ["Rubber Hose", "Dispenser", "Drip Control", "Strenth"],
+        series: [50, 5, 35, 10]
+    };
 
 
     function initCharts(){

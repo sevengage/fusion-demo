@@ -62,7 +62,7 @@ fusionDashboard.directive("map", ["fusion", function (fusion){
 
 			// listens for the broadcast to refresh the map markers
 			$scope.$watch("markers", function (newVal, oldVal){
-				if(newVal !== oldVal){
+				if(newVal !== oldVal && $scope.markers.length !== 0){
 					addMarkers();
 				}
 			});
@@ -85,15 +85,21 @@ fusionDashboard.directive("notifications", ["$timeout", function ($timeout){
 		replace: true,
 		template: ['<div id="notification" class="notification-module rounded-corners">',
 						'<a href="" class="notification-close"><i class="icon-cross"></i></a>',
-						'<div class="notification-status rounded-corners in"><i class="icon-dot-single"></i></div>',
-						'<h3 class="notificaiton-name">Marshall Grant</h3>',
-						'<p class="notificaiton-detail">Checked in at 10:03 PM</p>',
-					'</div>'].join(" "),
+						'<div class="notification-status rounded-corners"><i class="icon-dot-single"></i></div>',
+						'<h3 class="notificaiton-name">{{staff_member}}</h3>',
+						'<p class="notificaiton-detail">{{staff_status}}</p>',
+					'</div>'].join(""),
 		link: function($scope, element){
 
 			$scope.$on("dataLoaded", function (event, data){
 				if(data){
+
+					$scope.staff_member = $scope.interactionData[data.key].name;
+					$scope.staff_status = $scope.interactionData[data.key].end === "" ? "Checked in at "+ $scope.interactionData[data.key].start : "Checked out at "+ $scope.interactionData[data.key].end;
+
 					animateNotification(true);
+
+					changeStatus($scope.interactionData[data.key].end === "");
 
 					$timeout(function(){
 						animateNotification(false);
@@ -105,6 +111,13 @@ fusionDashboard.directive("notifications", ["$timeout", function ($timeout){
 			// runs our animation
 			function animateNotification(value){
 				$(element).toggleClass("active", value);
+			}
+
+
+			function changeStatus(value){
+				$(element).find(".notification-status")
+					.toggleClass("in", value)
+					.toggleClass("out", !value);
 			}
 
 

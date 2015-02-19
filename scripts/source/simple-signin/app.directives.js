@@ -5,24 +5,27 @@
 
 	/* Check the user in and disable form
 	-----------------------------------------------*/
-	fusionApp.directive("checkInCheck", ["$window", "$timeout", function ($window, $timeout){
+	fusionApp.directive("checkInCheck", ["$window", "$timeout", "firebaseService", "utility", function ($window, $timeout, firebaseService, utility){
 		return {
 			restrict: "AC",
 			template: '<a href="" class="ui-btn btn" id="checkMeIn">Check Me In</a>',
 			link: function($scope, element){
 
 				function checkInConfirm(){
-					if($scope.App.staffid && $scope.App.storeNumber && $scope.App.inventory && $scope.App.price && $scope.App.demoLocation){
+					if($scope.App.start && $scope.App.lat && $scope.App.lon && $scope.App.location){
 						$("#checkIn").find("input").attr("readonly", true).end()
 							.find("select").selectmenu('disable');
 
-						element.replaceWith("<div class='green ui-btn btn'>Thanks! You're in!</div>");
 
-						$scope.checkedIn = true;
+						firebaseService.update($scope.App)
+							.then(function(){
+								utility.checkedIn(element);
+								$scope.checkedIn = true;
 
-						$timeout(function(){
-							$window.location.hash = "#report";
-						}, 1000);
+							}, function (error){
+								$window.alert(error);
+							});
+
 
 					}else{
 						$window.alert(msg.havent_checked_in);
@@ -30,9 +33,7 @@
 				}
 
 				//bind to the element
-				element.click(function (){
-					checkInConfirm();
-				});
+				element.click(checkInConfirm);
 
 			}
 		};
@@ -100,7 +101,8 @@
 					navigator.geolocation.getCurrentPosition(function (position){
 						var img, address, coords = {lat: position.coords.latitude, lon: position.coords.longitude};
 						
-						$scope.App.position = coords;
+						$scope.lat = coords.lat;
+						$scope.lon = coords.lon;
 						
 						img = new Image();
 						img.src = app.config.googleApis.maps +"/staticmap?maptype=roadmap&zoom=18&size=900x200&markers=color:red|label:A|"+ coords.lat +","+ coords.lon +"&key="+ app.config.googleKey +"";
@@ -109,10 +111,10 @@
 
 
 						$.get(app.config.googleApis.maps + "/geocode/json?latlng="+ coords.lat +","+ coords.lon +"&key="+ app.config.googleKey +"" , function(data){
-							$scope.App.checkedInAddress = " Aprox. "+ data.results[0].formatted_address;
+							$scope.checkedInAddress = data.results[0].formatted_address;
 						});
 
-					},geo_error, geo_options);
+					}, geo_error, geo_options);
 				}
 
 				function geo_error() {

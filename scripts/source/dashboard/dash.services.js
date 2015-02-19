@@ -13,7 +13,7 @@ fusionDashboard.service('InteractionService', ["$firebase", "fusion", function (
 		sync = $firebase(ref);
 		
 	this.getSync = function(){
-		return sync.$asObject();
+		return sync.$asArray();
 	};
 
 
@@ -21,21 +21,17 @@ fusionDashboard.service('InteractionService', ["$firebase", "fusion", function (
 		var pos, posArray = [];
 
 		for(pos in data){
-			posArray.push(data[pos].position);
+			if( typeof data[pos] === "object" ){
+				if(data[pos].lat !== ""){
+					posArray.push({
+						lat: data[pos].lat,
+						lon: data[pos].lon
+					});
+				}
+			}
 		}
 
 		return posArray;
 	};
 
 }]);
-
-
-// var item, arr = [], 
-// 			data = sync.$asObject();
-
-// 		for(item in data.posts){
-// 			dataArray.push(item)
-// 		}
-
-
-// 		return data;

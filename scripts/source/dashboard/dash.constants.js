@@ -15,7 +15,7 @@ var fusionDashboard = angular.module("dashboard", ["angular-chartist", "firebase
 --------------------------- */
 fusionDashboard.constant('fusion', {
 	config: {
-		firebase: "https://glaring-inferno-2943.firebaseio.com/",
+		firebase: "https://fusion-signin-app.firebaseio.com/",
 		googleApis: {
 			key: "AIzaSyCJL4ZhaSPo0dib7Nlk1XoJEn1sNwWflJI",
 			maps: "https://maps.googleapis.com/maps/api"

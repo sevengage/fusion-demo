@@ -39,34 +39,91 @@
 
 
 
+
+
+/* ----------------------------------------------------------------
+	Login Auth Controller
+------------------------------------------------------------------*/
+
+	fusionApp.controller("LoginController", ["$scope", "$window", "utility", "loader", function ($scope, $window, utility, loader){
+		var	config = app.config,
+			msg = config.messages,
+			ref = new Firebase(config.firebase),
+			connectedRef = new Firebase(config.firebase + "/.info/connected");
+		
+		$scope.email = "";
+		$scope.password = "";
+
+		$scope.loginUser = function(){
+			var fieldCheck = utility.loginCheck($scope, {
+				username: "#email",
+				password: "#pass"
+			});
+
+			if(fieldCheck){
+				ref.authWithPassword({
+					email: $scope.email,
+					password: $scope.password
+				
+				}, function (error){
+					if(error === null){
+						
+						$scope.$emit("login", {"email": $scope.email});
+
+						//checks our internet connection
+						connectedRef.on("value", function(snap) {
+							if (snap.val() !== true) {
+								$window.alert(msg.lost_internet_connection);
+							}
+						});
+
+					}else{
+						$window.alert(error);
+						loader.init(false);
+						return;
+					}
+				});
+
+			}else{
+				return;
+			}
+		};
+
+
+	}]);
+
+
+
+
+
 /* ----------------------------------------------------------------
 	Main App Controller
 ------------------------------------------------------------------*/
 
-!function (angular, app, $, Firebase){
-
-	//run add to home screen prompt
-	window.addToHomescreen();
-
-
-	/* App Controller
-	----------------------------------------------------*/
-	fusionApp.controller("FusionAppController", ["$scope", "$interval", "$window", "locStorage", "now", "utility", "loader", function ($scope, $interval, $window, locStorage, now, utility, loader){
+	fusionApp.controller("FusionAppController", ["$scope", "$interval", "$window", "firebaseService", "locStorage", "now", "utility", "loader", function ($scope, $interval, $window, firebaseService, locStorage, now, utility, loader){
 
 		var count = 1, autoSave,
 			useSaved = false,
 			showOnce = 0,
 			config = app.config,
 			msg = config.messages,
-			ref = new Firebase(config.firebase),
-			presenceRef = new Firebase(config.firebase +'/disconnectmessage'),
-			connectedRef = new Firebase(config.firebase + "/.info/connected");
+			ref = new Firebase(config.firebase);
 
+		$scope.App = {};
 		$scope.checkedIn = false;
 
-		$scope.email = "";
-		$scope.password = "";
-		$scope.confirm_password = "";
+
+		// listens for login
+		$scope.$on("login", function (event, data){
+			$scope.email = data.email;
+
+			app.config.loggedin = true;
+
+			$scope.App = firebaseService.getData();
+
+			$scope.App.then(init);
+		});
+
 
 		//Demo Controller Array for better formatting
 		$scope.demos = [
@@ -77,7 +134,7 @@
 		];
 
 		/* Main App Model Data
-		----------------------------------------*/
+		----------------------------------------
 		$scope.App = {
 			title: "Fusion-Henkle",
 			//checkin
@@ -103,6 +160,38 @@
 			numberOfInteractions: ""
 		};
 
+		*/
+
+		function init(data){
+			$scope.App = firebaseService.getUserData({
+				email: $scope.email,
+				data: data
+			});
+
+			if($scope.App.start === ""){
+				angular.extend($scope.App, {
+					date: now.getDate(),
+					start: now.getTime(),
+					//interactions: [],
+					lat: $scope.lat,
+					lon: $scope.lon,
+					location: $scope.checkedInAddress
+				});
+				
+			}else{
+				$scope.checkedIn = true;
+				utility.checkedIn(".checkInCheck");
+			}
+
+			$window.location.hash = "#checkIn";
+
+			//$scope.startAutoSave();
+			//$scope.checkStorage();
+
+			console.log($scope.App);
+		}
+		
+
 
 		//hide the browser
 		utility.broswerScrollTo();
@@ -121,22 +210,33 @@
 		$scope.setCheckOut = function(){
 			var time, checkoutCheck;
 
-			if($scope.checkedIn){
+			if($scope.App.start !== ""){
 
-				time = now.getTime();
+				if($scope.App.end === ""){
+					
+					time = now.getTime();
 
-				checkoutCheck = $window.confirm(msg.checkout_confirm);
+					checkoutCheck = $window.confirm(msg.checkout_confirm);
+					
+					//make sure its only setting once
+					if(count === 1 && Boolean(time) && checkoutCheck === true){
+						$scope.App.end = time;
+						//document.getElementById("timeOut").value = time;
+						count += 1;
+					}
+
+					$scope.App.hours = utility.setWorkedHours({
+						date: $scope.App.date,
+						start: $scope.App.start,
+						end: $scope.App.end,
+					});
+
+					if(checkoutCheck === false){ $window.location.hash = "#report"; }
+
+				}else{
+					utility.hasCheckedOut();
+				}
 				
-				//make sure its only setting once
-				if(count === 1 && Boolean(time) && checkoutCheck === true){
-					$scope.App.timeOut = time;
-					document.getElementById("timeOut").value = time;
-					count += 1;
-				}
-
-				if(checkoutCheck === false){
-					$window.location.hash = "#report";
-				}
 
 			}else{
 				$window.alert(msg.havent_checked_in);
@@ -151,7 +251,7 @@
 		/* Checks localstorage to see if the user has a saved report
 		----------------------------------------------------------------*/
 		$scope.checkStorage = function(){
-			var lastVersion;
+			var lastVersion, items, i;
 
 			if( Boolean($window.localStorage.fusionHenkle) && useSaved === false){
 				useSaved = $window.confirm(msg.use_last_saved);
@@ -162,21 +262,18 @@
 
 					lastVersion = $.parseJSON(lastVersion);
 
-					$scope.$apply(function(){
-						var items, i;
-
-						//pushes saved items to the scope except for interactions
-						for(items in lastVersion){
-							if(items !== "interactions"){
-								$scope.App[items] = lastVersion[items];
-							}
+					//pushes saved items to the scope except for interactions
+					for(items in lastVersion){
+						if(items !== "interactions"){
+							//$scope.App[items] = lastVersion[items];
 						}
+					}
 
-						//itterates though the saved interactions and pushes them to the scope
-						for (i = lastVersion.interactions.length - 1; i >= 0; i -= 1) {
-							$scope.App.interactions.push(lastVersion.interactions[i]);
-						}
-					});
+					//itterates though the saved interactions and pushes them to the scope
+					for (i = lastVersion.interactions.length - 1; i >= 0; i -= 1) {
+						$scope.App.interactions.push(lastVersion.interactions[i]);
+					}
+					
 
 				}else{
 					localStorage.delete();
@@ -228,90 +325,45 @@
 
 			if($scope.checkedIn){
 				loader.init(true);
-
-				postsRef.push($scope.App, function (error){
-					if(error === null){
-						loader.init(false);
-
-						$window.alert(msg.submit_success);
-
-						//delete saved report in local storage
-						locStorage.delete();
-
-						//stop the auto save
-						$scope.stopAutoSave();
-
-						//reset form controls
-						utility.resetForm("#checkOut, #checkIn");
-
-						//log the user out
-						config.loggedin = false;
-
-						//refresh the browser
-						$window.location.href = $window.location.pathname;
-
-					}else{
-						$window.alert(msg.cant_save_data, error);
-					}
-
-				});
+				firebaseService.update($scope.App).then(updateSuccess, updateFail);
 
 			}else{
 				$window.alert(msg.havent_checked_in);
 				$window.location.hash = "#checkIn";
 			}
 
-		};
 
+			function updateSuccess(){
+				loader.init(false);
 
+				$window.alert(msg.submit_success);
 
-		/* ----------------------------------------------------------------
-			Login Auth Controller
-		------------------------------------------------------------------*/
+				//delete saved report in local storage
+				locStorage.delete();
 
-		$scope.loginUser = function(){
-			var fieldCheck = utility.loginCheck($scope, {
-				username: "#email",
-				password: "#pass"
-			});
+				//stop the auto save
+				$scope.stopAutoSave();
 
-			if(fieldCheck){
-				ref.authWithPassword({
-					email: $scope.email,
-					password: $scope.password
-				
-				}, function (error){
-					if(error === null){
-						app.config.loggedin = true;
-						$window.location.hash = "#checkIn";
+				//reset form controls
+				utility.resetForm("#checkOut, #checkIn");
 
-						$scope.startAutoSave();
-						$scope.checkStorage();
+				//log the user out
+				config.loggedin = false;
 
-						//checks our internet connection
-						connectedRef.on("value", function(snap) {
-							if (snap.val() !== true) {
-								$window.alert(msg.lost_internet_connection);
-							}
-						});
-
-					}else{
-						$window.alert(error);
-						loader.init(false);
-						return false;
-					}
-				});
-
-			}else{
-				return false;
+				//refresh the browser
+				$window.location.href = $window.location.pathname;
 			}
-			
+
+
+			function updateFail(){
+				$window.alert(msg.cant_save_data, error);
+			}
+
+
+
 		};
 
 
 	}]);
-
-
-}(window.angular, window.app, window.jQuery, window.Firebase);
 
 

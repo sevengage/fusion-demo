@@ -16,7 +16,7 @@
 <title>Fusion Mobile App</title>
 <link rel="stylesheet" href="styles/jquery.mobile-1.4.2.min.css" type="text/css">
 <link rel="stylesheet" href="styles/addtohomescreen.css" type="text/css" >
-<link rel="stylesheet" href="fonts/style.css" type="text/css" >
+<link rel="stylesheet" href="styles/fonts.css" type="text/css" >
 <link rel="stylesheet" href="styles/app.css" type="text/css" >
 
 <!-- iPhone SPLASHSCREEN-->
@@ -44,7 +44,7 @@
 
 
 
-		<div data-role="page" id="login" class="login-page">
+		<div data-role="page" id="login" class="login-page" ng-controller="LoginController">
 			<div class="align-center center">
 				<h1 class="yellow-txt"><img src="assets/fusion_logo.png" /><br> Fusion</h1>
 			</div>
@@ -79,37 +79,17 @@
 					<geo-location></geo-location>
 			
 					<div class="ui-grid-a">
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="staffId">Staff ID</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="staffId" ng-model="App.staffid" placeholder=""/></div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="staffId">Name</label></div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="staffId" ng-model="App.name" placeholder=""/></div></div>
 
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="storeNumber">Store Number</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="storeNumber" ng-model="App.storeNumber" placeholder="#"/></div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="storeNumber">Phone</label></div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="storeNumber" ng-model="App.cell" placeholder="#"/></div></div>
 
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="demoDate">Demo Date</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" readonly name="" id="demoDate" value="{{App.demoDate}}" placeholder="Demo Date"/></div></div>
+						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="demoDate">Date</label></div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" readonly name="" id="demoDate" value="{{App.date}}" placeholder="Demo Date"/></div></div>
 
 						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="timeIn">Time In</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="-in" readonly id="timeIn" value="{{App.timeIn}}" placeholder="Time In (Read Only)"/></div></div>
-
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="inventory">Inventory</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="inventory" ng-model="App.inventory" value="" placeholder=""/></div></div>
-
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="price">Product Price</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="price" ng-model="App.price" value="" placeholder="$"/></div></div>
-
-						<div class="ui-block-a"><div class="ui-bar ui-bar-a row tall-row"><label for="location">Demo Location</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row tall-row">
-						<select name="" id="location" ng-model="App.demoLocation">
-							<option selected></option>
-							<option value="paint">Across from the paint desk</option>
-							<option value="entrance">Near entrance</option>
-							<option value="glue">Glue aisle</option>
-							<option value="other">Other (specify)</option>
-						</select>
-						</div></div>
-
-						<div class="ui-block-a hide" id="whenOther"><div class="ui-bar ui-bar-a row"><label for="otherLocation">Other Location</label></div></div>
-						<div class="ui-block-b hide" id="whenOtherField"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="otherLocation" ng-model="App.otherLocation" value="" placeholder="Specify"/></div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="in" readonly id="timeIn" value="{{App.start}}" placeholder="Time In (Read Only)"/></div></div>
 
 					</div><!-- /grid-a -->
 				</fieldset>
@@ -279,22 +259,23 @@
 						</div></div>
 
 						<div class="ui-block-a"><div class="ui-bar ui-bar-a row"><label for="timeOut">Time Out</label></div></div>
-						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="timeOut" placeholder="(Read Only)"/></div></div>
+						<div class="ui-block-b"><div class="ui-bar ui-bar-a row"><input type="text" name="" id="timeOut" value="{{App.end}}" readonly placeholder="(Read Only)"/></div></div>
 
 					</div><!-- /grid-a -->
 				</fieldset>
 
-			<a href="" class="ui-btn btn" ng-click="submitReport()">Send My Report</a>
+			<a href="" class="ui-btn btn" ng-click="submitReport()" id="SendReport">Send My Report</a>
+			
 
-			<div data-role="footer" data-position="fixed" id="footer">
+			<!-- <div data-role="footer" data-position="fixed" id="footer">
 				<div data-role="navbar">
 					<ul class="footer-links">
-						<li><a href="#checkIn"><i class="icon-arrow-down2"></i><br> Check In</a></li>
-						<li><a href="#report" data-transition="slide" data-direction="reverse"><i class="icon-signup"></i><br> Interactions</a></li>
+						<li><a href=""><i class="icon-arrow-down2"></i><br> Check In</a></li>
+						<li><a href="" data-transition="slide" data-direction="reverse"><i class="icon-signup"></i><br> Interactions</a></li>
 						<li><a href="#checkOut" class="ui-btn-active" ng-click="setCheckOut()"><i class="icon-arrow-up2"></i><br> Check Out</a></li>
 					</ul>
 				</div>
-			</div><!-- /navbar -->
+			</div> --><!-- /navbar -->
 
 		</div>
 
@@ -302,9 +283,10 @@
 
 <script src="scripts/lib/addtohomescreen.js"></script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.28/angular.min.js"></script>
-<script src="scripts/lib/angular-touch.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js"></script>
 <script src="https://cdn.firebase.com/js/client/2.0.4/firebase.js"></script>
+<script src="https://cdn.firebase.com/libs/angularfire/0.9.2/angularfire.min.js" type="text/javascript"></script>
+<script src="scripts/lib/angular-touch.js"></script>
 
 <script src="scripts/source/simple-signin/app.constants.js"></script>
 <script src="scripts/source/simple-signin/app.services.js"></script>

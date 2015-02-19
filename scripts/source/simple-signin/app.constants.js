@@ -5,12 +5,12 @@
 //Global Namespace
 var app = app || {};
 
-var fusionApp = angular.module("fusion", ["ngTouch"]);
+var fusionApp = angular.module("fusion", ["ngTouch", "firebase"]);
 
 //Global Configurations
 app.config = {
 	url: "http://appmanagr.net/mobile/index.php/api/rest",
-	firebase: "https://glaring-inferno-2943.firebaseio.com",
+	firebase: "https://fusion-signin-app.firebaseio.com/",
 	googleApis: {
 		maps: "https://maps.googleapis.com/maps/api"
 	},
@@ -35,10 +35,15 @@ app.config = {
 		not_saved: '<p class="alert alert-error">Report not saved. <a href="#notSaved">More &raquo;</a></p>',
 		geo_position_error: "Whoa! We having an issue determining your position. Don't worry. Its cool.",
 		cant_save_data: "Oh Snap! Something happned and we couldn't save your submission. Try again. Error:",
-		lost_internet_connection: "Oh wow.  Looks like you just lost your internet connection. Please besure to reconnect soon."
+		lost_internet_connection: "Oh wow.  Looks like you just lost your internet connection. Please besure to reconnect soon.",
+		already_checked_out: "Sweet! You've already checked out."
 	},
-	googleKey: "AIzaSyCJL4ZhaSPo0dib7Nlk1XoJEn1sNwWflJI"
+	googleKey: "AIzaSyCJL4ZhaSPo0dib7Nlk1XoJEn1sNwWflJI",
 	//https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyCJL4ZhaSPo0dib7Nlk1XoJEn1sNwWflJI&location=34.0274273,-84.3225148&radius=500
+	templates: {
+		checked_in: '<div class="green ui-btn btn">Thanks! You&#39;re in!</div>',
+		checked_out: '<div class="green ui-btn btn">Sweet! You&#39;re good!</div>',
+	}
 };
 
 
