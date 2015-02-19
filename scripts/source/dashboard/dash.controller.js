@@ -54,6 +54,24 @@ fusionDashboard.controller('DashboardController', ["$scope", "fusion", "Interact
     }
    
 
+    // Sets the total hours worked for each checked in person
+    $scope.setWorkedHours = function(){
+        var totalHours, timeIn, timeOut;
+
+        if(this.item.end !== ""){
+            timeIn = new Date(this.item.date +" "+ this.item.start);
+            timeOut = new Date(this.item.date +" "+ this.item.end);
+
+            totalHours = (timeOut - timeIn)/1000; /* get total seconds */
+            totalHours = (totalHours/60)/60; /* get total minutes then hours */
+
+            return totalHours < 0 ? 0 : totalHours.toFixed(2);
+
+        }else{
+            return "0.00";
+        }
+    };
+
 
 
 

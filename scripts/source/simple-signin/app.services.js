@@ -142,6 +142,8 @@
 		this.setWorkedHours = function(args){
 			var totalHours, timeIn, timeOut;
 
+			args.date = args.date.replace(/-/g, "/");
+
 			timeIn = new Date(args.date +" "+ args.start);
 			timeOut = new Date(args.date +" "+ args.end);
 

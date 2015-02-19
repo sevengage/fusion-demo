@@ -54,11 +54,16 @@ input[placeholder].error{color: #c0392b;}
 .ui-page-theme-a .ui-btn.btn{margin: 15px; border-radius: 5px; background-color: #ddd; color: #555; text-transform: uppercase; text-shadow:none;}
 .ui-grid-a{border-radius: 5px;}
 .ui-overlay-a, .ui-page-theme-a{background-color: #f2f2f2}
-.ui-bar-a{background-color: #fff; border-left: none; border-right: none; border-top:none;}
+.ui-bar-a{background-color: #fff; border-left: none; border-right: none; border-top:none; border-radius: 5px}
 .ui-page-theme-a .ui-bar-inherit{background-color: #333; color:#ffe600; text-shadow:0 1px 0 #000; }
 .ui-input-text input, .ui-page-theme-a .ui-body-inherit, html .ui-bar-a .ui-body-inherit{border: none; background: none;}
 .ui-shadow-inset{ -webkit-box-shadow:none; box-shadow: none}
 .ui-page-theme-a .ui-slider-track .ui-btn-active, html .ui-bar-a .ui-slider-track .ui-btn-active{background-color: #555}
+.ui-page-theme-a .ui-btn:focus, html .ui-bar-a .ui-btn:focus, html .ui-body-a .ui-btn:focus, html body .ui-group-theme-a .ui-btn:focus, html head+body .ui-btn.ui-btn-a:focus, .ui-page-theme-a .ui-focus, html .ui-bar-a .ui-focus, html .ui-body-a .ui-focus, html body .ui-group-theme-a .ui-focus, html head+body .ui-btn-a.ui-focus, html head+body .ui-body-a.ui-focus {
+-webkit-box-shadow: none;
+-moz-box-shadow: none;
+box-shadow: none;
+}
 
 /* Login Page*/
 .login-page.ui-page-theme-a{background: url("../assets/grey_wash_wall.png") repeat}
